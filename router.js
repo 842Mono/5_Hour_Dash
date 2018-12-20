@@ -11,6 +11,15 @@ let Status = require('./Models/Status');
 
 // let controller = require("./controller");
 
+/**
+ * Route has multiple roles and should be divided into multiple routes.
+ * 
+ * * Updates information about an existing employee
+ * 
+ * * Deletes an employee
+ * 
+ * * Views attendance objects of an employee (constrained by a month)
+ */
 router.post('/edit', (req, res) =>
 {
     // console.log(req.body);
@@ -76,6 +85,10 @@ router.post('/edit', (req, res) =>
     }
 });
 
+
+/**
+ * Route for logging in. Extremely insecure.
+ */
 router.post('/plainlogin', (req, res) =>
 {
     console.log(req.body.usernamein);
@@ -98,115 +111,19 @@ router.post('/plainlogin', (req, res) =>
     );
 });
 
+
+/**
+ * Route displays the homepage
+ */
 router.get('/', (req, res) =>
 {
     res.sendFile("/Views/index.html", {root: __dirname });
 });
 
-router.get('/test', (req, res) =>
-{
-    res.send("working");
-});
 
-router.get('/populate', (req, res) =>
-{
-    // let TestEmployee = new Employee
-    // ({
-    //     Name:"user1",
-    //     Email:"user1@user1.com",
-    //     MobileNumber:"1111",
-    //     HireDate:new Date()
-    // });
-
-    // TestEmployee.save(err => {if(err) console.log(err)});
-
-    let TestUser = new User
-    ({
-        Name:"U1",
-        Email:"U1@U1.U1",
-        Password:"passU1"
-    });
-
-    TestUser.save(err => {if(err) console.log(err)});
-
-    res.send("done");
-});
-
-router.get('/testsession', function(req, res)
-{
-    console.log(res.session);
-    console.log(req.session);
-    // res.send(req.session);
-    // if(req.session)
-    //     console.log(req.session.test);
-    if(!req.session || req.session.test == null)
-        req.session.test = 0
-    else
-        req.session.test = parseInt(req.session.test) + 1;
-    res.send(req.session);
-});
-
-router.get("/ti", (r, res) =>{
-    let a4 = new Attendance
-    ({
-        DayDate:new Date("2011-8-8"),
-        WorkingHours:8,
-        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
-        Status:new Status({Type:"Present"})
-    });
-    a4.save(err => {if(err) console.log(err)});
-})
-
-router.get('/populateattendance', (req, res) =>
-{
-    let a1 = new Attendance
-    ({
-        DayDate:new Date("2011-1-1"),
-        WorkingHours:8,
-        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
-        Status:new Status({Type:"Present"})
-    });
-    a1.save(err => {if(err) console.log(err)});
-
-    let a2 = new Attendance
-    ({
-        DayDate:new Date("2011-1-2"),
-        WorkingHours:8,
-        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
-        Status:new Status({Type:"Present"})
-    });
-    a2.save(err => {if(err) console.log(err)});
-
-    let a3 = new Attendance
-    ({
-        DayDate:new Date("2011-1-3"),
-        WorkingHours:8,
-        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
-        Status:new Status({Type:"Present"})
-    });
-    a3.save(err => {if(err) console.log(err)});
-
-    let a4 = new Attendance
-    ({
-        DayDate:new Date("2011-1-4"),
-        WorkingHours:8,
-        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
-        Status:new Status({Type:"Present"})
-    });
-    a4.save(err => {if(err) console.log(err)});
-
-    let a5 = new Attendance
-    ({
-        DayDate:new Date("2011-1-2"),
-        WorkingHours:8,
-        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
-        Status:new Status({Type:"Present"})
-    });
-    a5.save(err => {if(err) console.log(err)});
-
-    res.send("population");
-});
-
+/**
+ * Route adds a new employee to the database.
+ */
 router.post('/addemployee', (req, res) =>
 {
     console.log("hena")
@@ -225,29 +142,18 @@ router.post('/addemployee', (req, res) =>
         CreateAndSendUserTemplate(res);
         if(err) console.log(err)
     });
-
-    
-
-    // Employee.insert
-    // (
-    //     {
-    //         Name:req.body.newname,
-    //         Email:req.body.newemail,
-    //         Mobile:req.body.newmobile,
-    //         HireDate:req.body.newhiredate
-    //     },
-    //     (err, result) =>
-    //     {
-    //         if(err)
-    //             console.log(err);
-    //         console.log(result);
-    //         CreateAndSendUserTemplate(res);
-    //     }
-    // );
 });
 
 module.exports = router;
 
+
+/**
+ * Function creates the template of the homepage of the User.
+ * 
+ * Used in multiple routes above.
+ * 
+ * @param {Response} res - The response object
+ */
 let CreateAndSendUserTemplate = res =>
 {
     Employee.find
@@ -372,3 +278,120 @@ let CreateAndSendUserTemplate = res =>
         }
     );
 }
+
+
+/////////////////////////////////////////////////////
+// routes for testing and for populating the database
+
+/**
+ * hello world :)
+ */
+router.get('/test', (req, res) =>
+{
+    res.send("working");
+});
+
+
+/**
+ * adds an attendance object for User2
+ */
+router.get("/ti", (r, res) =>
+{
+    let a4 = new Attendance
+    ({
+        DayDate:new Date("2011-8-8"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a4.save(err => {if(err) console.log(err)});
+});
+
+
+/**
+ * populates some attendance objects for User2 into the database
+ */
+router.get('/populateattendance', (req, res) =>
+{
+    let a1 = new Attendance
+    ({
+        DayDate:new Date("2011-1-1"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a1.save(err => {if(err) console.log(err)});
+
+    let a2 = new Attendance
+    ({
+        DayDate:new Date("2011-1-2"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a2.save(err => {if(err) console.log(err)});
+
+    let a3 = new Attendance
+    ({
+        DayDate:new Date("2011-1-3"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a3.save(err => {if(err) console.log(err)});
+
+    let a4 = new Attendance
+    ({
+        DayDate:new Date("2011-1-4"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a4.save(err => {if(err) console.log(err)});
+
+    let a5 = new Attendance
+    ({
+        DayDate:new Date("2011-1-2"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a5.save(err => {if(err) console.log(err)});
+
+    res.send("population");
+});
+
+
+/**
+ * Route adds an HR user to the database.
+ */
+router.get('/populate', (req, res) =>
+{
+    let TestUser = new User
+    ({
+        Name:"U1",
+        Email:"U1@U1.U1",
+        Password:"passU1"
+    });
+
+    TestUser.save(err => {if(err) console.log(err)});
+
+    res.send("done");
+});
+
+/**
+ * Route to test the session.
+ */
+router.get('/testsession', function(req, res)
+{
+    console.log(res.session);
+    console.log(req.session);
+    // res.send(req.session);
+    // if(req.session)
+    //     console.log(req.session.test);
+    if(!req.session || req.session.test == null)
+        req.session.test = 0
+    else
+        req.session.test = parseInt(req.session.test) + 1;
+    res.send(req.session);
+});
