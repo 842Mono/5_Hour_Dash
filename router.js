@@ -50,6 +50,20 @@ router.post('/edit', (req, res) =>
             }
         );
     }
+    else if(req.body.view)
+    {
+        Attendance.find
+        (
+            {_id:req.body.view},
+            (err, attendanceObjects) =>
+            {
+                if(err)
+                    console.log(err);
+
+                res.send(attendanceObjects);
+            }
+        );
+    }
 });
 
 router.post('/plainlogin', (req, res) =>
@@ -122,6 +136,50 @@ router.get('/testsession', function(req, res)
     res.send(req.session);
 });
 
+router.get('/populateattendance', (req, res) =>
+{
+    
+});
+
+router.post('/addemployee', (req, res) =>
+{
+    console.log("hena")
+    console.log(req.body);
+
+    let NewEmployee = new Employee
+    ({
+        Name:req.body.newname,
+        Email:req.body.newemail,
+        MobileNumber:req.body.newmobile,
+        HireDate:req.body.newhiredate
+    });
+
+    NewEmployee.save(err =>
+    {
+        CreateAndSendUserTemplate(res);
+        if(err) console.log(err)
+    });
+
+    
+
+    // Employee.insert
+    // (
+    //     {
+    //         Name:req.body.newname,
+    //         Email:req.body.newemail,
+    //         Mobile:req.body.newmobile,
+    //         HireDate:req.body.newhiredate
+    //     },
+    //     (err, result) =>
+    //     {
+    //         if(err)
+    //             console.log(err);
+    //         console.log(result);
+    //         CreateAndSendUserTemplate(res);
+    //     }
+    // );
+});
+
 module.exports = router;
 
 let CreateAndSendUserTemplate = res =>
@@ -154,6 +212,7 @@ let CreateAndSendUserTemplate = res =>
                       <th>Hire Date</th>
                       <th>Edit</th>
                       <th>Delete</th>
+                      <th>View Attendance</th>
                     </tr>`;
             
             for(let i = 0; i < employees.length; ++i)
@@ -169,10 +228,19 @@ let CreateAndSendUserTemplate = res =>
                 <td><input name="eyear${employees[i]._id}" type="date" value="${year}-${m}-${day}"></td>
                 <td><button name="edit" type="submit" value="${employees[i]._id}">Edit</button></td>
                 <td><button name="delete" type="submit" value="${employees[i]._id}">Delete</button></td>
+                <td><button name="view" type="submit" value="${employees[i]._id}">View</button></td>
               </tr>`;
             }
+
+            Template += `</form>         <form action="/addemployee" method="POST">
+            Name: <input type="text" name="newname"><br/>
+            Email: <input type="text" name="newemail"><br/>
+            Mobile: <input type="text" name="newmobile"><br/>
+            Hire Date: <input type="text" name="newhiredate"><br/>
+            <button type="submit">Add</button>
+        </form>`;
         
-            Template += `</form>          </table>
+            Template += `         </table>
             </body>
         </html>`
         
