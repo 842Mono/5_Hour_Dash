@@ -9,7 +9,7 @@ let User = require('./Models/User');
 let Attendance = require('./Models/Attendance');
 let Status = require('./Models/Status');
 
-let controller = require("./controller");
+// let controller = require("./controller");
 
 router.post('/edit', (req, res) =>
 {
@@ -308,11 +308,67 @@ let CreateAndSendUserTemplate = res =>
         
             Template += `         </table>
 
-            Attendance Month Filter:<input type="number" name="monthfilter" value=1>
-            </body>
-        </html>`
-        
-            res.send(Template);
+            Attendance Month Filter:<input type="number" name="monthfilter" value=1>`
+            
+            //Calculates the employee of the month
+            Employee.find
+            (
+                {},
+                (err, employees) =>
+                {
+                    if(err)
+                        console.log(err);
+
+                    let best = {}, hisAverage = 0;
+
+                    let recursion = (index) =>
+                    {
+                        //done
+                        if(index >= employees.length)
+                        {
+                            console.log(best);
+                            Template += `        <br/>
+                            <br/>
+                            <h3>Employee Of The Month:</h3>
+                            <p>` + best.Name;
+
+                            Template += `</p>
+                            </body>
+                        </html>`
+                        
+                            res.send(Template);
+                        }
+                        else
+                        {
+                            Attendance.find
+                            (
+                                {Employee:employees[index]._id},
+                                (err, attendances) =>
+                                {
+                                    let acc = 0;
+                                    for(let i = 0; i < attendances.length; ++i)
+                                    {
+                                        acc += parseInt(attendances[i].WorkingHours);
+                                    }
+                                    acc /= attendances.length;
+    
+                                    console.log(acc);
+                                    if(acc > hisAverage)
+                                    {
+                                        hisAverage = acc;
+                                        best = employees[index];
+                                    }
+                                    recursion(index+1);
+                                }
+                            );
+                        }
+                    }
+                    recursion(0);
+                }
+            );
+
+
+
         }
     );
 }
