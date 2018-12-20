@@ -1,3 +1,5 @@
+var ObjectID = require('mongodb').ObjectID;
+
 let express = require('express');
 let router = express.Router();
 
@@ -38,6 +40,8 @@ router.post('/edit', (req, res) =>
     }
     else if(req.body.delete)
     {
+
+        
         Employee.remove
         (
             {_id:req.body.delete},
@@ -52,15 +56,21 @@ router.post('/edit', (req, res) =>
     }
     else if(req.body.view)
     {
+        console.log(req.body.view);
         Attendance.find
         (
-            {_id:req.body.view},
+            {Employee:req.body.view},
             (err, attendanceObjects) =>
             {
                 if(err)
                     console.log(err);
-
-                res.send(attendanceObjects);
+                filtered = attendanceObjects.filter(a =>
+                {
+                    console.log(req.body.monthfilter);
+                    console.log(new Date(a.DayDate).getMonth()+1)
+                    return new Date(a.DayDate).getMonth()+1 == req.body.monthfilter;
+                });
+                res.send(filtered);
             }
         );
     }
@@ -136,9 +146,65 @@ router.get('/testsession', function(req, res)
     res.send(req.session);
 });
 
+router.get("/ti", (r, res) =>{
+    let a4 = new Attendance
+    ({
+        DayDate:new Date("2011-8-8"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a4.save(err => {if(err) console.log(err)});
+})
+
 router.get('/populateattendance', (req, res) =>
 {
-    
+    let a1 = new Attendance
+    ({
+        DayDate:new Date("2011-1-1"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a1.save(err => {if(err) console.log(err)});
+
+    let a2 = new Attendance
+    ({
+        DayDate:new Date("2011-1-2"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a2.save(err => {if(err) console.log(err)});
+
+    let a3 = new Attendance
+    ({
+        DayDate:new Date("2011-1-3"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a3.save(err => {if(err) console.log(err)});
+
+    let a4 = new Attendance
+    ({
+        DayDate:new Date("2011-1-4"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a4.save(err => {if(err) console.log(err)});
+
+    let a5 = new Attendance
+    ({
+        DayDate:new Date("2011-1-2"),
+        WorkingHours:8,
+        Employee:new ObjectID("5c1b665e94c2b97f345a7679"),
+        Status:new Status({Type:"Present"})
+    });
+    a5.save(err => {if(err) console.log(err)});
+
+    res.send("population");
 });
 
 router.post('/addemployee', (req, res) =>
@@ -241,6 +307,8 @@ let CreateAndSendUserTemplate = res =>
         </form>`;
         
             Template += `         </table>
+
+            Attendance Month Filter:<input type="number" name="monthfilter" value=1>
             </body>
         </html>`
         
