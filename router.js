@@ -9,6 +9,49 @@ let Status = require('./Models/Status');
 
 let controller = require("./controller");
 
+router.post('/edit', (req, res) =>
+{
+    // console.log(req.body);
+
+    if(req.body.edit)
+    {
+        let newName = req.body["ename" + req.body.edit];
+        let newEmail = req.body["eemail" + req.body.edit];
+        let newMobileNumber = req.body["emobile" + req.body.edit];
+        let newHireDate = req.body["eyear" + req.body.edit];
+
+        Employee.update
+        (
+            {_id:req.body.edit},
+            {
+                Name:newName,
+                Email:newEmail,
+                MobileNumber:newMobileNumber,
+                HireDate:newHireDate
+            },
+            (err, result) =>
+            {
+                console.log(result);
+                CreateAndSendUserTemplate(res);
+            }
+        );
+    }
+    else if(req.body.delete)
+    {
+        Employee.remove
+        (
+            {_id:req.body.delete},
+            (err, done) =>
+            {
+                if(err)
+                    console.log(err);
+                
+                CreateAndSendUserTemplate(res);
+            }
+        );
+    }
+});
+
 router.post('/plainlogin', (req, res) =>
 {
     console.log(req.body.usernamein);
@@ -24,60 +67,7 @@ router.post('/plainlogin', (req, res) =>
                 res.sendFile("/Views/index.html", {root: __dirname });
             else
             {
-                Employee.find
-                (
-                    {},
-                    (err, employees) =>
-                    {
-                        if(err)
-                            console.log(err);
-                        // res.send(employees);
-
-                        let Template = `<html>
-                        <head>
-                            <title>User Page</title>
-                        </head>
-                        <body>
-                            Welcome to the user page.
-                    
-                            <br/>
-                            <br/>
-                            Employees:
-                            <table style="width:100%; border: 1px solid black;">
-                                <tr>
-                                  <th>Name</th>
-                                  <th>Email</th>
-                                  <th>Mobile Phone</th>
-                                  <th>Hire Date</th>
-                                  <th>Edit</th>
-                                  <th>Delete</th>
-                                </tr>`;
-
-                                console.log(employees[1].HireDate)
-                        
-                        for(let i = 0; i < employees.length; ++i)
-                        {
-                            let dt = new Date(employees[i].HireDate);
-                            let m = parseInt(dt.getMonth());
-                            let day = parseInt(dt.getDay());
-                            let year  = parseInt(dt.getFullYear());
-                            Template += `            <tr>
-                            <td><input type="text" value="${employees[i].Name}"></td>
-                            <td><input type="text" value="${employees[i].Email}"></td> 
-                            <td><input type="text" value="${employees[i].MobileNumber}"></td>
-                            <td><input type="date" value="${year}-${m}-${day}"></td>
-                            <td><button type="submit">Edit</button></td>
-                            <td><button type="submit">Delete</button></td>
-                          </tr>`;
-                        }
-
-                        Template += `          </table>
-                        </body>
-                    </html>`
-
-                        res.send(Template);
-                    }
-                );
+                CreateAndSendUserTemplate(res);
                 // res.send(controller.GetEmployees());
             }
         }
@@ -133,3 +123,60 @@ router.get('/testsession', function(req, res)
 });
 
 module.exports = router;
+
+let CreateAndSendUserTemplate = res =>
+{
+    Employee.find
+    (
+        {},
+        (err, employees) =>
+        {
+            if(err)
+                console.log(err);
+            // res.send(employees);
+
+            let Template = `<html>
+            <head>
+                <title>User Page</title>
+            </head>
+            <body>
+                Welcome to the user page.
+        
+                <br/>
+                <br/>
+                Employees:
+                <form action="/edit" method="POST">
+                <table style="width:100%; border: 1px solid black;">
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Mobile Phone</th>
+                      <th>Hire Date</th>
+                      <th>Edit</th>
+                      <th>Delete</th>
+                    </tr>`;
+            
+            for(let i = 0; i < employees.length; ++i)
+            {
+                let dt = new Date(employees[i].HireDate);
+                let m = parseInt(dt.getMonth());
+                let day = parseInt(dt.getDay());
+                let year  = parseInt(dt.getFullYear());
+                Template += `            <tr>
+                <td><input name="ename${employees[i]._id}" type="text" value="${employees[i].Name}"></td>
+                <td><input name="eemail${employees[i]._id}" type="text" value="${employees[i].Email}"></td> 
+                <td><input name="emobile${employees[i]._id}" type="text" value="${employees[i].MobileNumber}"></td>
+                <td><input name="eyear${employees[i]._id}" type="date" value="${year}-${m}-${day}"></td>
+                <td><button name="edit" type="submit" value="${employees[i]._id}">Edit</button></td>
+                <td><button name="delete" type="submit" value="${employees[i]._id}">Delete</button></td>
+              </tr>`;
+            }
+        
+            Template += `</form>          </table>
+            </body>
+        </html>`
+        
+            res.send(Template);
+        }
+    );
+}

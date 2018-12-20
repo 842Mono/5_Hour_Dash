@@ -7,23 +7,25 @@
 
 
         Employees:
-        <table style="width:100%; border: 1px solid black;">
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Mobile Phone</th>
-              <th>Hire Date</th>
-              <th>Edit</th>
-              <th>Delete</th>
-            </tr>
-            <tr>
-              <td><input type="text" value="tempname"></td>
-              <td><input type="text" value="tempemail"></td> 
-              <td><input type="text" value="011"></td>
-              <td><input type="date" value="2011-09-29"></td>
-              <td><button type="submit">Edit</button></td>
-              <td><button type="submit">Delete</button></td>
-            </tr>
-          </table>
+        <form action="/edit" method="POST">
+            <table style="width:100%; border: 1px solid black;">
+                <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile Phone</th>
+                <th>Hire Date</th>
+                <th>Edit</th>
+                <th>Delete</th>
+                </tr>
+                <tr>
+                <td><input type="text" value="tempname"></td>
+                <td><input type="text" value="tempemail"></td> 
+                <td><input type="text" value="011"></td>
+                <td><input type="date" value="2011-09-29"></td>
+                <td><button type="submit">Edit</button></td>
+                <td><button type="submit">Delete</button></td>
+                </tr>
+            </table>
+        </form>
     </body>
 </html>
